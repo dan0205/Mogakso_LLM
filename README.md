@@ -19,4 +19,4 @@
 
 - 만들고자 하는 extension 프로그램을 agile 기법으로 구현할 것이기에 초기 단계의 class diagram, state diagram, usecase diagram을 미리 구현함
 - 초기의 usecase 를 기반으로 예상되는 성공 scenario와 실패 scenario를 각각 10개씩 작성
-- postgresql과 redis를 활용하는 java spring 서버를 계획, 필요한 dependencies를 준비
+- postgresql과 redis를 활용하는 fastAPI 서버 개발 준비
