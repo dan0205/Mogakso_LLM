@@ -53,3 +53,8 @@
 - useEffect 훅으로 컴포넌트가 처음 화면에 나타났을 때(API 호출) 로직을 실행
 - 실제 데이터 받아오기 (Fetch API 사용)
 - App.js에 컴포넌트 연결
+
+### 실습 진행
+
+- node.js 설치
+- npm install 및 npm start 명령어를 통해 응답 확인
