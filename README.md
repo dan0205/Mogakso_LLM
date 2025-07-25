@@ -58,3 +58,28 @@
 
 - node.js 설치
 - npm install 및 npm start 명령어를 통해 응답 확인
+
+## 3주차
+
+### 실습 목표
+
+---
+
+- 웹페이지 텍스트 선택 - 사용자가 드래그한 글자 감지
+
+### 실습 내용
+
+---
+
+### Content Script - 웹페이지에 코드 주입
+
+- 웹 브라우저 extension 프로그램을 위한 manifest.json 정의
+- manifest.json에 필요한 name, version, permissions, content_scripts, background를 지정
+- matches: ["<all_urls>"] 를 사용해 모든 페이지에서 해당 기능을 사용
+- window.getSelection().toString() 함수를 이용해 마우스로 드래그한 글자 인식
+
+### Background Script - 백그라운드에서 동작
+
+- 실제 기능을 구현되는 브라우저 이벤트를 정의
+- chrome.runtime.onMessage를 이용해 콘텐츠 스크립트가 보낸 '선택된 텍스트' 메시지를 수신
+- 특정 이벤트가 발생할 때만 활성화되어 코드를 실행하고, 일이 끝나면 비활성화 상태로 전환되어 시스템 자원을 아끼는 로직을 실행
