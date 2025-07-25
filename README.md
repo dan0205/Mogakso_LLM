@@ -73,21 +73,13 @@
 
 ### Content Script - 웹페이지에 코드 주입
 
-- 웹 브라우저 extension 프로그램을 위한 manifest.json 정의
-- manifest.json에 필요한 name, version, permissions, content_scripts, background를 지정
-- matches: ["<all_urls>"] 를 사용해 모든 페이지에서 해당 기능을 사용
-- window.getSelection().toString() 함수를 이용해 마우스로 드래그한 글자 인식
-  
-    if (selectedText.length > 0) {
-      console.log('선택된 텍스트:', selectedText); 
-  
-      chrome.runtime.sendMessage({ text: selectedText });
-    }
-
-- 원하는 이벤트에만 반응하고 해당 반응을 백그라운드에 보내는 로직을 구현함
+- 먼저, 웹 브라우저 extension 프로그램을 위한 manifest.json 정의하였음
+- manifest.json에 필요한 name, version, permissions, content_scripts, background 등의 기초적인 내용이 무엇인지 학습하고 지정함
+- 추가로, matches: ["<all_urls>"] 를 사용해 모든 페이지에서 해당 기능을 사용하게 함
+- content script에 window.getSelection().toString() 함수를 이용해서 마우스로 드래그한 모든 글자 인식하게 함
 
 ### Background Script - 백그라운드에서 동작
 
-- 실제 기능을 구현되는 브라우저 이벤트를 정의
-- chrome.runtime.onMessage를 이용해 콘텐츠 스크립트가 보낸 '선택된 텍스트' 메시지를 수신
-- 특정 이벤트가 발생할 때만 활성화되어 코드를 실행하고, 일이 끝나면 비활성화 상태로 전환되어 시스템 자원을 아끼는 로직을 실행
+- 실제 기능에 대한 브라우저 이벤트를 정의하였음, content script에서 결과를 받으면 콘솔에 보내기
+- chrome.runtime.onMessage를 이용해 콘텐츠 스크립트가 보낸 '선택된 텍스트' 메시지를 수신함
+- 특정 이벤트가 발생할 때만 활성화되어 코드를 실행하고, 일이 끝나면 비활성화 상태로 전환되어 시스템 자원을 아끼는 로직으로 구현하였음
