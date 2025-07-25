@@ -78,7 +78,7 @@
 - matches: ["<all_urls>"] 를 사용해 모든 페이지에서 해당 기능을 사용
 - window.getSelection().toString() 함수를 이용해 마우스로 드래그한 글자 인식
 
-'''document.addEventListener('mouseup', function(event) {
+document.addEventListener('mouseup', function(event) {
     const selectedText = window.getSelection().toString().trim();
   
     if (selectedText.length > 0) {
@@ -86,7 +86,7 @@
   
       chrome.runtime.sendMessage({ text: selectedText });
     }
-  });'''
+  });
 
 - 원하는 이벤트에만 반응하고 해당 반응을 백그라운드에 보내는 로직을 구현함
 
