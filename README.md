@@ -79,6 +79,7 @@
 - window.getSelection().toString() 함수를 이용해 마우스로 드래그한 글자 인식
 
 '''
+
 document.addEventListener('mouseup', function(event) {
     const selectedText = window.getSelection().toString().trim();
   
@@ -88,6 +89,7 @@ document.addEventListener('mouseup', function(event) {
       chrome.runtime.sendMessage({ text: selectedText });
     }
   });
+  
 '''
 
 - 원하는 이벤트에만 반응하고 해당 반응을 백그라운드에 보내는 로직을 구현함
