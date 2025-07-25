@@ -1,0 +1,16 @@
+{
+    "manifest_version": 3,
+    "name": "텍스트 선택 감지기",
+    "version": "1.0",
+    "description": "웹페이지에서 사용자가 선택한 텍스트를 감지하여 백그라운드로 전송합니다.",
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"]
+      }
+    ]
+  }
+  
