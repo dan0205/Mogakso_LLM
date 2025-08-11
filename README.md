@@ -98,12 +98,90 @@
 
 ### 3주차 실습에서 배운 content script 작성하기
 
-- 신조어 extension 서비스를 실제로 구현시키기 위해 필요한 세부사항을 정의하였다.
+- 먼저, 신조어 extension 서비스가 실제로 구현될 때 필요한 세부사항을 정의하였다.
 - 웹 사이트에서 드래그를 통해 데이터를 받고, 저장된 신조어가 해당 데이터에 있다면 툴팁을, 없다면 알림을 보내도록 설정하였다.
-- 실제 서비스 상황에선 예측할 수 없는 상황이 발생할 것임을 생각하여 두 개 이상의 신조어를 동시에 드래그하는 경우와 같은 예외를 정리하였다.
-- document.addEventListener를 이용해 사용자가 보다 자연스럽게 이용할 수 있도록 툴팁이 사라지는 방법도 구현하였다.
+- 다양한 반응 이미지를 적용해가며 사용자가 가장 편안하고 쉽게 사용할 수 있는 팝업 이미지를 적용하였다.
+- 데이터베이스와 연결된 프론트가 아니기 때문에, content script에 const JARGON_DATA = { … } 형태로 목업 데이터를 지정하였다.
+- 추후에 데이터베이스와 연결되면, 해당 단어를 데이터베이스와 캐시에서 검색하게 된다.
 
 ### docker-compose 파일을 작성하고, docker로 redis와 postgres를 사용
 
 - 서버 단에서 사용될 데이터 구조를 정의하였다.
-- 우선 신조어 명칭과 신조어 설명만을 테이블에 담고, extension에서 사용되는 프론트 단과 연결하였다.
+- 우선 신조어 명칭과 신조어 설명만을 테이블에 담고, extension에서 사용되는 프론트 단과 연결하기 위해 코드를 구현한다.
+- redis와 postgres 모두 alpine 버전을 사용하여 성능보다 가벼움 위주로 구현하였다.
+
+## 5주차
+
+### 실습 목표
+
+---
+
+- 서버와 프론트를 연결하고 서비스를 실행한다
+
+### 실습 내용
+
+---
+
+### 목업 프론트를 업그레이드
+
+- 4주차 실습에서 실제로 구현해본 프론트에서 문제점을 정의하였다.
+- 드래그가 계속 되어있다면 팝업창을 지워도 반복적으로 나타나고, 팝업창의 x표시로만 제거할 수 있고, 팝업창에 단 하나만의 단어만 표시된다는 문제점을 발견하였다.
+- content script에 다양한 js function을 사용하여 다양한 상황에 적합한 예외들을 모두 적용하였다.
+- addEventListner를 이용해 팝업창이 뜬 후, 다른 곳을 클릭, 다른 단어를 드래그, x표시를 클릭, 다른 곳을 우클릭 하는 등의 방법으로도 팝업창을 제거할 수 있도록 추가하였다.
+
+### 구현된 서버단을 이용해 프론트 단과 연결
+
+### 1. 내용 스크립트 로드
+
+- manifest.json이 content_simple.js를 모든 페이지에 주입
+
+```json
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content_simple.js"],
+      "run_at": "document_idle"
+    }
+  ],
+```
+
+### 2. 내용 스크립트 → 백그라운드
+
+- content_simple.js는 직접 fetch하지 않고 chrome.runtime.sendMessage({ type: "FETCH_JARGON", ... })로 백그라운드에 요청
+- background.js가 실제 백엔드로 요청 전송
+
+```jsx
+      const API_BASE = "http://127.0.0.1:8000/api/v1"; // 127로 고정
+      const url = `${API_BASE}/jargons/interpret/${encodeURIComponent(msg.term)}?context=${encodeURIComponent(msg.context || "")}`;
+
+      log("fetch start", url);
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), 10000);
+
+      const res = await fetch(url, { method: "GET", signal: controller.signal });
+```
+
+### 3. 백엔드 라우팅
+
+- app/main.py에서 v1 라우터를 /api/v1 프리픽스로 마운트
+
+```python
+app.include_router(jargon_router.router, prefix="/api/v1", tags=["Jargons"])
+```
+
+- 실제 엔드포인트는 app/api/v1/jargon_router.py의 이 라우트가 처리
+
+```python
+@router.options("/jargons/interpret/{term}")
+async def options_interpret(term: str):
+    # 아무 검증/의존성 없이 프리플라이트에 204 No Content
+    return Response(status_code=204)
+
+@router.get("/jargons/interpret/{term}")
+async def interpret_jargon(
+    term: str,
+    context: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+    rds: redis.Redis = Depends(get_redis),
+):
+```
